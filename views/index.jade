@@ -1,0 +1,31 @@
+doctype html
+html
+  head
+    title= front.title
+    link(rel='stylesheet', href='/styles/index.css')
+    script(src='/libs/gt/gazeTargets.js')
+    //- script(src='/libs/md5.js')
+  body
+    #gt-warning(style={display: 'none'}) You need the "ETU-Driver Service" application running with "WebSocket server" flag set on
+    
+    h1= front.title
+
+    #gt-target.gt-target gt-target
+
+    form#config-form
+        .option
+            input#config-role-receiver(type='checkbox', value='receiver')
+            label(for='config-role-receiver') receive data
+        .option
+            input#config-role-sender(type='checkbox', value='sender')
+            label(for='config-role-sender') send data
+        input(type='submit', value='Configure')
+
+    #log
+
+    script(src='/js/gazeNet.js')
+    script.
+        GazeNet({
+            host: '#{web.host}',
+            port: #{web.port}
+        });

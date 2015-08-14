@@ -1,0 +1,22 @@
+- var count = 0;
+
+doctype html
+html
+  head
+    title #{title}
+    link(rel='stylesheet', href='/styles/display.css')
+  body
+    h1 #{title}
+
+    if sessions
+      ul
+        each session in sessions
+          li [#{session.timestamp}] #{session.id}
+            hr
+            if session.events.length > 0
+              ul
+                each record, i in session.events
+                  li
+                    p #{i} [#{record.timestamp}]: #{record.event.target} = #{record.event.name}
+            else
+              p No events

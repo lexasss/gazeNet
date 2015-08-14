@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+var app = require('../app');
+var config = require('../config/app');
+var roles = require('../helpers/shared/roles');
+var Records = require('../models/records');
+var WebSocketServer = require('ws').Server;
+var debug = require('debug')(process.env.npm_package_name);
+
+var messageBus = app.get('messageBus');
+var sessions = app.get('sessions');
+
+//app.set('port', config.web.port);
+
+var server = app.listen(config.web.port, undefined, undefined, function() {
+    debug('Express server listening on port ' + server.address().port);
+    console.log('Express server ' + server.address().address + ' listening on port ' + server.address().port);
+});
+
+var wss = new WebSocketServer({server: server});
+
+var lastID = 0;
+var clients = {};
+
+wss.on('connection', function(ws){
+
+    var id = 'ID_' + (++lastID);
+    var client = null;
+    var session;
+    
+    var print = function (text) {
+        console.log('[ ' + id + ' ] ' + text);
+    };
+
+    var parseEvent = function (data) {
+        print('event of ' + data.source + ' = ' + JSON.stringify(data.event));
+        if (client.role & roles.sender) {
+            sessions.update(
+                { timestamp: session.timestamp },
+                { $push: { events: Records.Event.create(data.event) } }, 
+                dbErrorHandler
+            );
+            messageBus.emit('message', data);
+        }
+    };
+
+    var parseConfig = function (config) {
+        print('config = ' + JSON.stringify(config));
+
+        var sources = config.sources;
+        if (sources instanceof Array) {
+            client.sources = sources;
+        } else if (typeof sources === 'string') {
+            client.sources = [ sources ];
+        } else {
+            client.sources = [ ];
+        }
+
+        client.page = config.page;
+        client.role = config.role ? config.role : roles.none;
+        src = config.source;
+        
+        if (client.role & roles.sender) {
+            session = Records.Session.create(id, config.source);
+            sessions.insert(session, dbErrorHandler);
+        }
+    };
+
+    var wsListener = function (data) {
+        if (!(client.role & roles.receiver)) {
+            return;
+        }
+
+        var sources = client.sources;
+        if (sources && sources.indexOf(data.source) >= 0) {
+            print('ws.send: ' + JSON.stringify(data.event));
+            ws.send(JSON.stringify({
+                event: data.event
+            }));
+        } else {
+            print('data source "' + data .source+ '" in not in the list of sources: ' + sources);
+        }
+    };
+
+    var dbErrorHandler = function (err, doc) {
+        if (err) {
+            print('DB ERROR: ' + err);
+        }
+    };
+
+    messageBus.on('message', wsListener);
+
+    ws.on('message', function(data){
+        var json = JSON.parse(data);
+        if (json.event) {
+            parseEvent(json);
+        } else if (json.config) {
+            parseConfig(json.config);
+        } else {
+            print('?');
+        }
+    });
+
+    ws.on('close', function(){
+        messageBus.removeListener('message', wsListener);
+        print('disconnected');
+        delete clients[id];
+    });
+
+    client = {
+        sources: []
+    };
+    clients[id] = client;
+
+    print('connected');
+});
