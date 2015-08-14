@@ -16,7 +16,7 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: 'ui/styles',
+                        cwd: 'front/styles',
                         src: ['*.less'],
                         dest: 'public/styles/',
                         ext: '.css'
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
                 debug: true
             },
             gazenet: {
-                src: ['ui/js/*.js', 'helpers/shared/*.js'],
+                src: ['front/js/*.js', 'helpers/shared/*.js'],
                 dest: 'public/js/gazeNet.js'
             }
         },
@@ -47,7 +47,7 @@ module.exports = function(grunt) {
                 separator: grunt.util.linefeed + grunt.util.linefeed
             },
             js: {
-                src: ['ui/js/gazeNet/*.js', 'helpers/shared/*.js'],
+                src: ['front/js/gazeNet/*.js', 'helpers/shared/*.js'],
                 dest: 'public/js/gazeNet.js'
             }
         },
@@ -55,20 +55,20 @@ module.exports = function(grunt) {
         copy: {
             libs: {
                 expand: true,
-                cwd: 'ui/libs/',
+                cwd: 'front/libs/',
                 src: '**',
                 dest: 'public/libs/'
             },
             images: {
                 expand: true,
-                cwd: 'ui/images/',
+                cwd: 'front/images/',
                 src: '**/*.png',
                 dest: 'public/images/',
                 flatten: false
             },
             fonts: {
                 expand: true,
-                cwd: 'ui/fonts/',
+                cwd: 'front/fonts/',
                 src: '*.*',
                 dest: 'public/fonts/',
                 flatten: true,
@@ -81,7 +81,7 @@ module.exports = function(grunt) {
                 livereload: true,
             },
             js: {
-                files: 'ui/js/**',
+                files: 'front/js/**',
                 tasks: ['browserify:gazenet']
             },
             shared: {
@@ -89,19 +89,19 @@ module.exports = function(grunt) {
                 tasks: ['browserify']
             },
             less: {
-                files: 'ui/styles/*.less',
+                files: 'front/styles/*.less',
                 tasks: ['less', 'autoprefixer', 'concat:css', 'clean']
             },
             libs: {
-                files: 'ui/libs/**',
+                files: 'front/libs/**',
                 tasks: ['copy:libs']
             },
             images: {
-                files: 'ui/images/**',
+                files: 'front/images/**',
                 tasks: ['copy:images']
             },
             fonts: {
-                files: 'ui/fonts/**',
+                files: 'front/fonts/**',
                 tasks: ['copy:fonts']
             }
         },

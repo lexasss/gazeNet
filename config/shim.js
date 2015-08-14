@@ -1,3 +1,3 @@
 module.exports = {
-    '../ui/libs/md5.js': { exports: 'md5' }
+    '../front/libs/md5.js': { exports: 'md5' }
 };

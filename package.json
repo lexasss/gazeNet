@@ -1,9 +1,14 @@
 {
   "name": "gazeNet",
   "version": "0.0.1",
-  "description": "Shares gaze data over the net",
-  "author": "Terlici Ltd.",
+  "description": "A server to shares gaze data over the net",
+  "author": "github.com/lexasss",
+  "keywords": "eye gaze data event sharing web",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lexasss/gazeNet.git"
+  },
   "main": "/.bin/www",
   "config": {
     "web": {
@@ -27,7 +32,7 @@
     "transform": [ "browserify-shim" ]
   },
   "browser": {
-    "md5": "./ui/libs/md5.js"
+    "md5": "./front/libs/md5.js"
   },
   "browserify-shim": {
     "md5": "md5"
