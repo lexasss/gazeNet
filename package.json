@@ -13,7 +13,7 @@
   "config": {
     "web": {
       "host": "localhost",
-      "port": 88
+      "port": 80
     },
     "front": {
       "title": "GazeNet"
@@ -26,7 +26,8 @@
     }
   },
   "scripts": {
-    "start": "grunt && db && (start grunt watch & node ./bin/www)"
+    "start": "grunt && db && (start grunt watch & node ./bin/www)",
+    "production": "db && node ./bin/www"
   },
   "browserify": {
     "transform": [ "browserify-shim" ]

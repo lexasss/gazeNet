@@ -16,7 +16,7 @@ if "%ERRORLEVEL%"=="0" (
 ) else (
     
     if not exist data (
-        mkdir db
+        mkdir data
     )
 
     echo Starting Mongo...
