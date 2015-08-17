@@ -2,7 +2,16 @@
 echo.
 
 if "%npm_package_config_db_port%"=="" (
-    set npm_package_config_db_port=27002
+    set npm_package_config_db_port=27017
+)
+if "%npm_package_config_db_path%"=="" (
+    if exist C:\mongodb\bin\mongod.exe (
+        set npm_package_config_db_path=C:\mongodb\bin\mongod.exe
+    ) else (
+        echo Mongo is not found in "C:\mongodb", check config.db.path in package.json
+        echo.
+        exit /b 1
+    )
 )
 
 tasklist | find /i "mongod.exe" >nul
@@ -20,7 +29,7 @@ if "%ERRORLEVEL%"=="0" (
     )
 
     echo Starting Mongo...
-    start "mongod" "C:\mongodb\bin\mongod.exe" "--config" "config\mongod.cfg" "--port" "%npm_package_config_db_port%"
+    start "mongod" "%npm_package_config_db_path%" "--config" "config\mongod.cfg" "--port" "%npm_package_config_db_port%"
 
     ping -n 5 127.0.0.1 >nul 
     tasklist | find /i "mongod.exe" >nul

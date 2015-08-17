@@ -20,6 +20,7 @@
     },
     "back": {},
     "db": {
+      "path": "C:\\mongodb\\bin\\mongod.exe",
       "host": "localhost",
       "port": 27017,
       "name": "gazenet"
