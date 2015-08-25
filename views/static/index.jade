@@ -1,14 +1,15 @@
 doctype html
 html
   head
-    title= front.title
+    title GazeNet example
     link(rel='stylesheet', href='/styles/index.css')
+    script(src='http://localhost:35729/livereload.js')
     script(src='/libs/gt/gazeTargets.js')
     //- script(src='/libs/md5.js')
   body
     #gt-warning(style={display: 'none'}) You need the "ETU-Driver Service" application running with "WebSocket server" flag set on
     
-    h1= front.title
+    h1 GazeNet example
 
     #gt-target.gt-target gt-target
 
@@ -24,8 +25,3 @@ html
     #log
 
     script(src='/js/gazeNet.js')
-    script.
-        GazeNet({
-            host: '#{web.host}',
-            port: #{web.port}
-        });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var app = require('../app');
-var config = require('../config/app');
+var config = require('../helpers/config');
 var roles = require('../helpers/shared/roles');
 var Records = require('../models/records');
 var WebSocketServer = require('ws').Server;

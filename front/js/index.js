@@ -8,11 +8,8 @@ var roles = require('../../helpers/shared/roles');
 var Client = require('./client');
 var Event = require('./event');
 
-function GazeNet(options) {
+(function GazeNet() {
 
-    Client.host = options.host || Client.host;
-    Client.port = options.port || Client.port;
-    
     var client = new Client();
 
     var configForm = document.querySelector('#config-form');
@@ -72,8 +69,8 @@ function GazeNet(options) {
             }
         });
     };
-}
+})();
 
 // Publication
 
-window.GazeNet = GazeNet;
+//window.GazeNet = GazeNet;

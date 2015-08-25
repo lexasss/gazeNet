@@ -14,8 +14,8 @@ function Client() {
 // Properties
 
 // Settings with default values, should be updated in .jade with values from npm.config
-Client.port = 3000;
-Client.host = 'localhost';
+Client.port = [[[web.port]]] || 3000;
+Client.host = [[[web.host]]] || 'localhost';
 
 // Mehtods of this property will result in error: jQuery is not used in this project
 Client.LongPoll = {

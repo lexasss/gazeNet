@@ -9,10 +9,11 @@ for (var prop in env) {
 		var parts = prop.split('_');
 		var obj = config;
 		for (var i = 3; i < parts.length; i++) {
-			if (obj[parts[i]] === undefined) {
-				obj[parts[i]] = i === (parts.length - 1) ? env[prop] : { };
+			var name = parts[i];
+			if (obj[name] === undefined) {
+				obj[name] = i === (parts.length - 1) ? env[prop] : { };
 			}
-			obj = obj[parts[i]];
+			obj = obj[name];
 		}
 	}
 }

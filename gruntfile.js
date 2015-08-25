@@ -37,7 +37,13 @@ module.exports = function(grunt) {
             },
             gazenet: {
                 src: ['front/js/*.js', 'helpers/shared/*.js'],
-                dest: 'public/js/gazeNet.js'
+                dest: 'public/js/<%= pkg.name %>.js',
+                options: {
+                    process: function(content, srcpath) {
+                        return '// processed' + content;
+                        //.replace(/<!-- local -->[\w\W]*<!-- end_of_local -->/, '<script src="visic.js" type="text/javascript"></script>');
+                    }
+                }
             }
         },
 
@@ -47,12 +53,63 @@ module.exports = function(grunt) {
                 separator: grunt.util.linefeed + grunt.util.linefeed
             },
             js: {
-                src: ['front/js/gazeNet/*.js', 'helpers/shared/*.js'],
-                dest: 'public/js/gazeNet.js'
+                src: ['public/js/<%= pkg.name %>.js'],
+                dest: 'public/js/<%= pkg.name %>.js',
+                options: {
+                    process: function(content, srcpath) {
+                        return 'content;
+                    }
+                }
             }
         },
         */
+
         copy: {
+            js: {
+                src: ['public/js/<%= pkg.name %>.js'],
+                dest: 'public/js/<%= pkg.name %>.js',
+                options: {
+                    // This procedure replace [[[NAME]]] found in JS with the corresponding values 
+                    // from 'config' in package.json
+                    process: function(content, srcpath) {
+
+                        var pkg = grunt.file.readJSON('package.json');
+
+                        function replacer(match, p1, offset, string) {
+
+                            var configPath = p1.split('.');
+                            var pathIsValid = true;
+                            var configValue = pkg.config;
+
+                            for (var i = 0; i < configPath.length; ++i) {
+                                var key = configPath[i].trim();
+                                var value = configValue[key];
+                                if (!value) {
+                                    pathIsValid = false;
+                                    break;
+                                }
+                                configValue = value;
+                            }
+
+                            if (pathIsValid) {
+                                if (typeof configValue === 'number' || 
+                                    typeof configValue === 'boolean') {
+                                    return '' + configValue;
+                                }
+                                if (typeof configValue === 'string') {
+                                    return '\'' + configValue + '\'';
+                                }
+                            }
+
+                            grunt.log.error();
+                            grunt.log.error('Grunt config parser:');
+                            grunt.log.error('-  no value for "' + p1 + '" in "config" entry of package.json: ');
+                            throw new Error();
+                        }
+                        return content.replace(/\[\[\[([\w\.]+)\]\]\]/gi, replacer);
+                    }
+                }
+            },
             libs: {
                 expand: true,
                 cwd: 'front/libs/',
@@ -75,10 +132,34 @@ module.exports = function(grunt) {
                 filter: 'isFile'
             }
         },
+
+        // Include this taks only if using nginx to serve with the static pages
+        jade: {
+            options: {
+                pretty: true,
+                processContent: function (content, filename) {
+                    return content.replace(/( href| src)\=\'\//g, '$1=\'..\/');
+                }
+            },
+            compile: {
+                files: [{
+                    expand: true,
+                    cwd: 'views/static/',
+                    src: ['**/*.jade'],
+                    dest: 'public/html/',
+                    ext: '.html',
+                    filter: 'isFile'
+                }],
+            }
+        },
         
         watch: {
             options: {
                 livereload: true,
+            },
+            jade: {
+                files: 'views/**',
+                tasks: ['jade']
             },
             js: {
                 files: 'front/js/**',
@@ -106,17 +187,15 @@ module.exports = function(grunt) {
             }
         },
         
-        /*
         connect: {
             server: {
                 options: {
-                    port: 8001,
-                    base: 'build',
+                    port: 0,
+                    base: ['public', 'helpers/shared'],
                     keepalive: true
                 }
             }
         }
-        */
     });
 
     grunt.loadNpmTasks('grunt-contrib-less');
@@ -127,7 +206,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    
-    grunt.registerTask('default', ['clean', 'less', 'autoprefixer', 'browserify', 'copy']);
-    grunt.registerTask('listen', ['connect']);
+    grunt.loadNpmTasks('grunt-contrib-jade');
+
+    grunt.registerTask('default', ['clean', 'less', 'autoprefixer', 'browserify', 'copy', 'jade']);
 };
